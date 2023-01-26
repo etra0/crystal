@@ -116,6 +116,22 @@ describe Socket, tags: "network" do
       ensure
         socket.try &.close
       end
+
+      it "binds to port using default IP" do
+        socket = TCPSocket.new family
+        socket.bind unused_local_port
+        socket.listen
+
+        address = socket.local_address.as(Socket::IPAddress)
+        address.address.should eq(any_address)
+        address.port.should be > 0
+
+        socket.close
+
+        socket = UDPSocket.new family
+        socket.bind unused_local_port
+        socket.close
+      end
     end
   end
 end

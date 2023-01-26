@@ -116,8 +116,15 @@ class Socket < IO
   # sock.bind 1234
   # ```
   def bind(port : Int)
-    Addrinfo.resolve("::", port, @family, @type, @protocol) do |addrinfo|
-      system_bind(addrinfo, "::#{port}") { |errno| errno }
+    case @family
+    in Family::INET                 then domain = "0.0.0.0"
+    in Family::INET6                then domain = "::"
+    in Family::UNSPEC, Family::UNIX then raise Socket::Error.new("Can't bind a socket of family #{@family} using only the port.")
+    end
+
+    domain_and_port = "#{domain}:#{port}"
+    Addrinfo.resolve(domain, port, @family, @type, @protocol) do |addrinfo|
+      system_bind(addrinfo, domain_and_port) { |errno| errno }
     end
   end
 
