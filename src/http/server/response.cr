@@ -64,6 +64,7 @@ class HTTP::Server
       @wrote_headers = false
       @output = @original_output
       @original_output.reset
+      @status_message = nil
     end
 
     # Convenience method to set the `Content-Type` header.
